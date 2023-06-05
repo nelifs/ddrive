@@ -23,8 +23,6 @@ class DiscordFileSystem {
         this.rest = new REST({ ...DEFAULT_REST_OPTS, ...opts.restOpts });
         this.lastWbIdx = 0;
 
-        this.rest.post(this.webhookURL, { content: 'DDrive started.', auth: false });
-
         //
         // Validate parameters
         //
@@ -100,6 +98,10 @@ class DiscordFileSystem {
         return this.rest.post(this.webhookURL, { files: [file], auth: false });
     }
 
+    _webhookSend(message) {
+        return this.rest.post(this.webhookURL, { data: message, auth: false });
+    }
+
     /**
      * @description Read files from discord and write it to stream
      * @param stream
@@ -156,6 +158,7 @@ class DiscordFileSystem {
             const part = { name: uuid(), data: encrypted || data };
             const { attachments: [attachment] } = await this._uploadFile(part);
             // Push part object into array and return later
+            this._webhookSend(`File ${chunkCount + 1} of ${parts.length}`);
             parts[chunkCount] = { url: attachment.url, size: attachment.size, iv };
         };
 
