@@ -158,7 +158,7 @@ class DiscordFileSystem {
             const part = { name: uuid(), data: encrypted || data };
             const { attachments: [attachment] } = await this._uploadFile(part);
             // Push part object into array and return later
-            this._webhookSend(`File ${chunkCount + 1} of ${parts.length}`);
+            //this._webhookSend(`File ${chunkCount + 1} of ${parts.length}`);
             parts[chunkCount] = { url: attachment.url, size: attachment.size, iv };
         };
 
