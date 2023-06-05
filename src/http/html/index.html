@@ -11,7 +11,7 @@
     <link href="favicon.png" rel="shortcut icon" sizes="196x196">
     <link href="favicon.png" rel="apple-touch-icon">
     <meta content="website" property="og:type"/>
-    <meta content="DDrive" property="og:title"/>
+    <meta content="nelifs DDrive" property="og:title"/>
     <meta content="https://github.com/forscht/ddrive" property="og:url"/>
     <meta content="Encrypted Open Source File Sharing." property="og:description"/>
     <meta content="/favicon.png" property="og:image"/>
@@ -29,7 +29,7 @@
 <div class="container">
     <div class="terminal-nav">
         <header class="terminal-logo">
-            <div class="logo terminal-prompt"><a class="no-style" href="https://github.com/forscht/ddrive">DDrive</a>
+            <div class="logo terminal-prompt"><a href="https://nelifs.xyz">nelifs DDrive</a>
             </div>
         </header>
         <nav class="terminal-menu">
@@ -41,7 +41,7 @@
         </nav>
     </div>
     <p>
-        Cloud storage system using Discord.
+        Cloud storage system using <span style="color: var(--primary-color)">Discord</span>.
     </p>
 </div>
 
@@ -95,7 +95,7 @@
                     <svg id="clipboard-btn" style="vertical-align: middle; height: 1.2rem; width: 1.2rem"
                          fill="currentColor" class="bi bi-share" viewBox="0 0 16 16">
                         <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"
-                             ></path>
+                        ></path>
                     </svg>
                 </button>
                 <!--                Upload-->
@@ -126,7 +126,7 @@
         </thead>
         <thead>
         <tr>
-            <th style="border-right: none;">Title</th>
+            <th style="border-right: none;">Name</th>
             <th style="border-left: none;border-right: none">Size</th>
             <th style="border-left: none">Created At</th>
         </tr>
@@ -142,53 +142,53 @@
     <hr/>
     <script src="index.js"></script>
     <script>
-        document.documentElement.classList.add('dark')
+        document.documentElement.classList.add('dark');
         if (navigator.serviceWorker) {
             navigator.serviceWorker.register('./sw.js')
                 .then(function (registration) {
-                    console.log('Excellent, registered with scope: ', registration.scope)
-                })
+                    console.log('Excellent, registered with scope: ', registration.scope);
+                });
         }
 
         // Fake click upload file button
         document.getElementById('upload-btn')
             .addEventListener('click', function () {
                 document.getElementById('file-input')
-                    .click()
-            })
+                    .click();
+            });
 
         //
         // Progress bar section code
         //
-        const progressSection = document.getElementById('progress-section')
+        const progressSection = document.getElementById('progress-section');
 
         function createProgressBar(id, title) {
-            const progressDiv = document.createElement('div')
-            progressDiv.setAttribute('id', `${id}-div`)
+            const progressDiv = document.createElement('div');
+            progressDiv.setAttribute('id', `${id}-div`);
             progressDiv.innerHTML = `
             <p>${title}</p>
             <div class="progress-bar progress-bar-show-percent">
                 <div id="${id}-progress-bar" class="progress-bar-filled" style="width: 0" data-filled="Porgress 0%"></div>
-            </div>`
-            progressSection.appendChild(progressDiv)
+            </div>`;
+            progressSection.appendChild(progressDiv);
         }
 
         function updateProgressBar(id, per) {
-            const pbar = document.getElementById(`${id}-progress-bar`)
-            pbar.style.width = `${per}%`
-            pbar.setAttribute('data-filled', `Progress ${per}%`)
+            const pbar = document.getElementById(`${id}-progress-bar`);
+            pbar.style.width = `${per}%`;
+            pbar.setAttribute('data-filled', `Progress ${per}%`);
         }
 
         function deleteProgressBar(id, timeout = 3000) {
-            const progressDiv = document.getElementById(`${id}-div`)
-            setTimeout(() => progressSection.removeChild(progressDiv), timeout)
+            const progressDiv = document.getElementById(`${id}-div`);
+            setTimeout(() => progressSection.removeChild(progressDiv), timeout);
         }
 
         //
         // New placeholder TR for Folder
         //
-        function createFolderTR(id){
-            const tr = document.createElement('tr')
+        function createFolderTR(id) {
+            const tr = document.createElement('tr');
             tr.innerHTML = `
             <td style="border-right: none">
                 <svg style="vertical-align: middle" xmlns="http://www.w3.org/2000/svg" width="18"
@@ -197,20 +197,20 @@
                     <path d="M.54 3.87.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.826a2 2 0 0 1-1.991-1.819l-.637-7a1.99 1.99 0 0 1 .342-1.31zM2.19 4a1 1 0 0 0-.996 1.09l.637 7a1 1 0 0 0 .995.91h10.348a1 1 0 0 0 .995-.91l.637-7A1 1 0 0 0 13.81 4H2.19zm4.69-1.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981l.006.139C1.72 3.042 1.95 3 2.19 3h5.396l-.707-.707z"
                           ></path>
                 </svg>
-                <a class="folder"><input id="${id}" type="text" style="height: 1rem; width: 80%" value="" min="1"></a>
+                <a class="folder"><input id="${id}" type="text" style="height: 1rem; width: 80%" placeholder="folder name" value="" min="1"></a>
             </td>
             <td style="border-left: none;border-right: none"> - </td>
-            <td style="border-left: none">${new Date().toLocaleString()}</td>`
-            document.getElementById('tbody').append(tr)
+            <td style="border-left: none">${new Date().toLocaleString()}</td>`;
+            document.getElementById('tbody').append(tr);
 
-            return document.getElementById(id)
+            return document.getElementById(id);
         }
 
         //
         // Create dynamic TR for folders
         //
         function prepareFolderTR(data) {
-            const tr = document.createElement('tr')
+            const tr = document.createElement('tr');
             tr.innerHTML = `
             <td style="border-right: none" title="${data.name}">
                 <svg style="vertical-align: middle" xmlns="http://www.w3.org/2000/svg" width="18"
@@ -222,16 +222,16 @@
                 <a class="folder" id="${data.id}">${data.name}</a>
             </td>
             <td style="border-left: none;border-right: none"> - </td>
-            <td style="border-left: none">${new Date(data.createdAt).toLocaleString()}</td>`
+            <td style="border-left: none">${new Date(data.createdAt).toLocaleString()}</td>`;
 
-            return tr
+            return tr;
         }
 
         //
         // Create dynamic TR for files
         //
         function prepareFileTR(data) {
-            const tr = document.createElement('tr')
+            const tr = document.createElement('tr');
             tr.innerHTML = `
             <td style="border-right: none" title="${data.name}">
                 <svg style="vertical-align: middle" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
@@ -243,33 +243,33 @@
                 <a class="file" id="${data.id}">${data.name}</a>
             </td>
             <td style="border-left: none;border-right: none">${humanReadableSize(data.size)}</td>
-            <td style="border-left: none">${new Date(data.createdAt).toLocaleString()}</td>`
+            <td style="border-left: none">${new Date(data.createdAt).toLocaleString()}</td>`;
 
-            return tr
+            return tr;
         }
 
         //
         // Util functions
         //
         function humanReadableSize(bytes, si = false, dp = 1) {
-            const thresh = si ? 1000 : 1024
+            const thresh = si ? 1000 : 1024;
 
             if (Math.abs(bytes) < thresh) {
-                return `${bytes} B`
+                return `${bytes} B`;
             }
 
             const units = si
                 ? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-                : ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
-            let u = -1
-            const r = 10 ** dp
+                : ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+            let u = -1;
+            const r = 10 ** dp;
 
             do {
-                bytes /= thresh
-                u += 1
-            } while (Math.round(Math.abs(bytes) * r) / r >= thresh && u < units.length - 1)
+                bytes /= thresh;
+                u += 1;
+            } while (Math.round(Math.abs(bytes) * r) / r >= thresh && u < units.length - 1);
 
-            return `${bytes.toFixed(dp)} ${units[u]}`
+            return `${bytes.toFixed(dp)} ${units[u]}`;
         }
 
     </script>
