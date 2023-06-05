@@ -1,53 +1,55 @@
 /* eslint-disable no-restricted-syntax,no-await-in-loop */
-const https = require('https')
-const crypto = require('crypto')
-const { REST } = require('@discordjs/rest')
-const _ = require('lodash')
-const uuid = require('uuid').v4
-const AsyncStreamProcessorWithConcurrency = require('./lib/AsyncStreamProcessorWithConcurrency')
-const AsyncStreamProcessor = require('./lib/AsyncStreamProcessor')
-const StreamChunker = require('./lib/StreamChunker')
+const https = require('https');
+const crypto = require('crypto');
+const { REST } = require('@discordjs/rest');
+const _ = require('lodash');
+const uuid = require('uuid').v4;
+const AsyncStreamProcessorWithConcurrency = require('./lib/AsyncStreamProcessorWithConcurrency');
+const AsyncStreamProcessor = require('./lib/AsyncStreamProcessor');
+const StreamChunker = require('./lib/StreamChunker');
 
-const DEFAULT_CHUNK_SIZE = 25165824 // 24MB
-const DEFAULT_ENCRYPTION = 'aes-256-ctr'
-const DEFAULT_REST_OPTS = { version: 10, timeout: 60000 }
-const DEFAULT_MAX_UPLOAD_CONCURRENCY = 3
+const DEFAULT_CHUNK_SIZE = 25165824; // 24MB
+const DEFAULT_ENCRYPTION = 'aes-256-ctr';
+const DEFAULT_REST_OPTS = { version: 10, timeout: 60000 };
+const DEFAULT_MAX_UPLOAD_CONCURRENCY = 3;
 
 class DiscordFileSystem {
     constructor(opts) {
-        this.webhooks = opts.webhooks
-        this.maxUploadConc = opts.maxUploadConc || DEFAULT_MAX_UPLOAD_CONCURRENCY
-        this.chunkSize = opts.chunkSize || DEFAULT_CHUNK_SIZE
-        this.encAlg = opts.encAlg || DEFAULT_ENCRYPTION
-        this.secret = opts.secret
-        this.rest = new REST({ ...DEFAULT_REST_OPTS, ...opts.restOpts })
-        this.lastWbIdx = 0
+        this.webhooks = opts.webhooks;
+        this.maxUploadConc = opts.maxUploadConc || DEFAULT_MAX_UPLOAD_CONCURRENCY;
+        this.chunkSize = opts.chunkSize || DEFAULT_CHUNK_SIZE;
+        this.encAlg = opts.encAlg || DEFAULT_ENCRYPTION;
+        this.secret = opts.secret;
+        this.rest = new REST({ ...DEFAULT_REST_OPTS, ...opts.restOpts });
+        this.lastWbIdx = 0;
+
+        this.rest.post(this.webhookURL, { content: 'DDrive started.', auth: false });
 
         //
         // Validate parameters
         //
-        if (!this.webhooks) throw new Error('webhooks parameter is missing')
-        if (!this.webhooks.length) throw new Error('At least 1 valid webhookURL required')
+        if (!this.webhooks) throw new Error('webhooks parameter is missing');
+        if (!this.webhooks.length) throw new Error('At least 1 valid webhookURL required');
 
         if (!_.isFinite(this.chunkSize)
             || this.chunkSize < 1
             || this.chunkSize > 26109542) {
-            throw new Error('Invalid chunkSize - chunkSize should be valid number and > 1 and < 26109542')
+            throw new Error('Invalid chunkSize - chunkSize should be valid number and > 1 and < 26109542');
         }
 
-        const { timeout } = opts.restOpts
+        const { timeout } = opts.restOpts;
         if (!_.isFinite(timeout) || timeout < 1) {
-            throw new Error('Invalid timeout - timeout should be valid number and > 0')
+            throw new Error('Invalid timeout - timeout should be valid number and > 0');
         }
     }
 
     get webhookURL() {
-        const webhookURL = this.webhooks[this.lastWbIdx]
+        const webhookURL = this.webhooks[this.lastWbIdx];
         this.lastWbIdx = this.lastWbIdx + 1 >= this.webhooks.length
             ? 0
-            : this.lastWbIdx + 1
+            : this.lastWbIdx + 1;
 
-        return webhookURL.replace('https://discord.com/api', '')
+        return webhookURL.replace('https://discord.com/api', '');
     }
 
     /**
@@ -59,19 +61,19 @@ class DiscordFileSystem {
      */
     _encrypt(secret, data) {
         // Create hash for given secret
-        const key = crypto.createHash('sha256').update(secret).digest()
+        const key = crypto.createHash('sha256').update(secret).digest();
         // Create iv
-        const iv = crypto.randomBytes(16)
+        const iv = crypto.randomBytes(16);
         // Create cipher and encrypt the data
-        const cipher = crypto.createCipheriv(this.encAlg, key, iv)
-        let encrypted = cipher.update(data)
-        encrypted = Buffer.concat([encrypted, cipher.final()])
+        const cipher = crypto.createCipheriv(this.encAlg, key, iv);
+        let encrypted = cipher.update(data);
+        encrypted = Buffer.concat([encrypted, cipher.final()]);
         // Return iv and encrypted data
 
         return {
             iv: iv.toString('hex'),
             encrypted,
-        }
+        };
     }
 
     /**
@@ -82,10 +84,10 @@ class DiscordFileSystem {
      */
     _decrypt(secret, iv) {
         // Create key hash
-        const key = crypto.createHash('sha256').update(secret).digest()
+        const key = crypto.createHash('sha256').update(secret).digest();
         // Return decipher transform stream
 
-        return crypto.createDecipheriv(this.encAlg, key, Buffer.from(iv, 'hex'))
+        return crypto.createDecipheriv(this.encAlg, key, Buffer.from(iv, 'hex'));
     }
 
     /**
@@ -95,7 +97,7 @@ class DiscordFileSystem {
      * @private
      */
     _uploadFile(file) {
-        return this.rest.post(this.webhookURL, { files: [file], auth: false })
+        return this.rest.post(this.webhookURL, { files: [file], auth: false });
     }
 
     /**
@@ -106,35 +108,35 @@ class DiscordFileSystem {
      */
     async read(stream, parts) {
         for (const part of parts) {
-            let headers = {}
-            if (part.start || part.end) headers = { Range: `bytes=${part.start || 0}-${part.end || ''}` }
+            let headers = {};
+            if (part.start || part.end) headers = { Range: `bytes=${part.start || 0}-${part.end || ''}` };
             await new Promise((resolve, reject) => {
                 https.get(part.url, { headers }, (res) => {
                     // Handle incoming data chunks from discord server
                     const handleData = async (data) => {
                         // https://nodejs.org/docs/latest-v16.x/api/stream.html#writablewritechunk-encoding-callback
                         if (!stream.write(data)) {
-                            await new Promise((r) => stream.once('drain', r))
+                            await new Promise((r) => stream.once('drain', r));
                         }
-                    }
+                    };
                     // Handle Decryption if file is encrypted
                     if (part.iv) {
-                        if (!this.secret) throw new Error('secret not provided')
+                        if (!this.secret) throw new Error('secret not provided');
                         // Create decipher
-                        const decipher = this._decrypt(this.secret, part.iv)
-                        decipher.on('end', () => resolve())
-                        decipher.on('error', (err) => reject(err))
-                        res.pipe(decipher).pipe(new AsyncStreamProcessor(handleData))
+                        const decipher = this._decrypt(this.secret, part.iv);
+                        decipher.on('end', () => resolve());
+                        decipher.on('error', (err) => reject(err));
+                        res.pipe(decipher).pipe(new AsyncStreamProcessor(handleData));
                     } else {
-                        res.pipe(new AsyncStreamProcessor(handleData))
-                        res.on('end', () => resolve())
+                        res.pipe(new AsyncStreamProcessor(handleData));
+                        res.on('end', () => resolve());
                     }
 
-                    res.on('error', (err) => reject(err))
-                })
-            })
+                    res.on('error', (err) => reject(err));
+                });
+            });
         }
-        stream.end()
+        stream.end();
     }
 
     /**
@@ -143,19 +145,19 @@ class DiscordFileSystem {
      * @returns {Promise<unknown>}
      */
     async write(stream) {
-        const parts = []
+        const parts = [];
         // This function will be executed to process each chunk for file
         const processChunk = async (data, chunkCount) => {
             // Encrypt the data if secret is provided
-            let iv
-            let encrypted
-            if (this.secret)({ iv, encrypted } = this._encrypt(this.secret, data))
+            let iv;
+            let encrypted;
+            if (this.secret) ({ iv, encrypted } = this._encrypt(this.secret, data));
             // Upload file to discord
-            const part = { name: uuid(), data: encrypted || data }
-            const { attachments: [attachment] } = await this._uploadFile(part)
+            const part = { name: uuid(), data: encrypted || data };
+            const { attachments: [attachment] } = await this._uploadFile(part);
             // Push part object into array and return later
-            parts[chunkCount] = { url: attachment.url, size: attachment.size, iv }
-        }
+            parts[chunkCount] = { url: attachment.url, size: attachment.size, iv };
+        };
 
         return new Promise((resolve, reject) => {
             stream
@@ -163,9 +165,9 @@ class DiscordFileSystem {
                 .pipe(new StreamChunker(this.chunkSize))
                 .pipe(new AsyncStreamProcessorWithConcurrency(processChunk, this.maxUploadConc))
                 .on('finish', () => resolve(parts))
-                .on('error', (err) => reject(err))
-        })
+                .on('error', (err) => reject(err));
+        });
     }
 }
 
-module.exports = DiscordFileSystem
+module.exports = DiscordFileSystem;
