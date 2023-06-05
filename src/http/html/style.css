@@ -1,10 +1,14 @@
 :root {
-    --global-font-size: 1.1rem;
-    --global-line-height: 1.5em;
+    --global-font-size: 1rem;
+    --global-line-height: 1.4em;
     --global-space: 5px;
-    --page-width: 55rem;
-    --font-stack: Montserrat, monospace, serif;
-    --mono-font-stack: Montserrat, monospace, serif;
+    --page-width: 50rem;
+    --font-stack: Menlo, Monaco, Lucida Console, Liberation Mono,
+    DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace,
+    serif;
+    --mono-font-stack: Menlo, Monaco, Lucida Console, Liberation Mono,
+    DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace,
+    serif;
     --input-style: solid;
     --display-h1-decoration: none;
 }
@@ -35,15 +39,11 @@
     --code-bg-color: #3f3f44;
 }
 
-* {
-    font-weight: 600;
-    animation: fadeIn 1s ease-out;
-}
-
 table {
-    transition: color 300ms ease-in-out;
+    /*max-height: 80%;*/
+    /*height: 500px;*/
+    /*overflow-y: scroll;*/
 }
-
 th {
     text-align: left;
 }
@@ -57,11 +57,6 @@ td {
     overflow: clip;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-body {
-    animation: none;
-    margin-top: 50px;
 }
 
 table th {
@@ -81,26 +76,15 @@ table tbody td:first-child {
 button {
     /*cursor: pointer;*/
     color: var(--font-color);
-    transition: all 300ms ease-in-out;
 }
 
 button:hover {
-    color: var(--primary-color);
     cursor: pointer;
 }
-
 button:disabled {
     cursor: unset;
     color: var(--tertiary-color);
 }
 
 @media only screen and (min-width: 120em) {
-}
-
-@keyframes fadeIn {
-    0% {
-        margin-top: 50px;
-        filter: blur(5px);
-        opacity: 0;
-    }
 }
